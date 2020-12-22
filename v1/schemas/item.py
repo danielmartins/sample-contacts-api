@@ -8,7 +8,7 @@ class ContactBase(BaseModel):
     name: str
     gender: str
     phone: str
-    email: EmailStr
+    email: str
 
 
 class ContactCreate(ContactBase):
