@@ -1,0 +1,43 @@
+name: Deploy the application to Google Cloud Run
+on:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  deploy:
+    name: Deploy job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v1
+
+      - name: Build Docker image
+        run: |
+            echo '${{ secrets.FIREBASE_CREDENTIALS }}' > fbServiceKey.json
+            ls -livh
+            docker build --file docker/Dockerfile . --tag us.gcr.io/${{ secrets.GCLOUD_PROJECT }}/${{ secrets.GCLOUD_APP_NAME }}
+      - name: Authenticate into Google Cloud Platform
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          service_account_email: ${{ secrets. GCLOUD_EMAIL }}
+          service_account_key: ${{ secrets.GCLOUD_AUTH }}
+
+      - name: Configure Docker to use Google Cloud Platform
+        run: "gcloud auth configure-docker --quiet"
+
+      - name: Push image to Google Cloud Container Registry
+        run: docker push us.gcr.io/${{ secrets.GCLOUD_PROJECT }}/${{ secrets.GCLOUD_APP_NAME }}
+
+      - name: Install beta commands and deploy on cloud run
+        run: |
+          gcloud components install beta --quiet
+          gcloud beta run deploy ${{ secrets.GCLOUD_APP_NAME }} --quiet \
+            --image us.gcr.io/${{ secrets.GCLOUD_PROJECT }}/${{ secrets.GCLOUD_APP_NAME }} \
+            --project ${{ secrets.GCLOUD_PROJECT }} \
+            --region us-east1 \
+            --platform managed \
+            --set-env-vars=GOOGLE_APPLICATION_CREDENTIALS=/api/fbServiceKey.json \
+            --set-env-vars=GCLOUD_PROJECT=${{ secrets.GCLOUD_PROJECT }} \
+            --set-env-vars=PROJECT_ID=${{ secrets.GCLOUD_PROJECT }} \
+            --set-env-vars=SHORT_SHA=v${GITHUB_SHA:0:8}
