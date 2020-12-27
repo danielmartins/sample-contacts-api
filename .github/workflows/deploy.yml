@@ -40,4 +40,5 @@ jobs:
             --set-env-vars=GOOGLE_APPLICATION_CREDENTIALS=/api/fbServiceKey.json \
             --set-env-vars=GCLOUD_PROJECT=${{ secrets.GCLOUD_PROJECT }} \
             --set-env-vars=PROJECT_ID=${{ secrets.GCLOUD_PROJECT }} \
-            --set-env-vars=SHORT_SHA=v${GITHUB_SHA:0:8}
+            --set-env-vars=SHORT_SHA=v${GITHUB_SHA:0:8} \
+            --set-env-vars=FIREB_API_KEY=${{ secrets.FIREB_API_KEY }}
