@@ -1,10 +1,12 @@
 import os
 
 import aiohttp
-from fastapi import FastAPI
+import firebase_admin
+from fastapi import FastAPI, Depends
 
 from v1 import http
-from v1.routers import health, item, login
+from v1.deps import authenticate_user
+from v1.routers import health, login, contact
 
 os.environ["TZ"] = "UTC"
 
@@ -17,12 +19,17 @@ api.include_router(health.router)
 
 # /v1
 api_v1_prefix = "/v1"
-api.include_router(item.router, prefix=api_v1_prefix)
+
+# /v1/login
 api.include_router(login.router, prefix=api_v1_prefix)
+
+# /v1/contacts
+api.include_router(contact.router, prefix=api_v1_prefix, tags=["contacts"], dependencies=[Depends(authenticate_user)])
 
 
 @api.on_event("startup")
 async def startup_event() -> None:
+    firebase_admin.initialize_app()
     http.client.open(timeout=aiohttp.ClientTimeout(
         total=2 * 60,
         connect=5,

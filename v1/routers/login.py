@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from v1 import http
 from v1.deps import get_settings
-from v1.schemas.login import SignIn, SignInResponse
+from v1.schemas.login import SignInRequest, SignInResponse
 from v1.services.auth import AuthService
 from v1.settings import Settings
 
@@ -13,7 +13,7 @@ auth_service = AuthService()
 
 
 @router.post("/login", response_model=SignInResponse, tags=["login"])
-async def login(sign_in: SignIn, http_client: aiohttp.ClientSession = Depends(http.client),
+async def login(sign_in: SignInRequest, http_client: aiohttp.ClientSession = Depends(http.client),
                 settings: Settings = Depends(get_settings)):
     """
     login in google auth

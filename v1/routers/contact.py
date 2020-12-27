@@ -1,25 +1,25 @@
 from typing import List
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 
+from v1.deps import get_contacts_service
 from v1.schemas.item import Contact, ContactCreate, ContactUpdate
 from v1.services.item import ContactService
 
 router = APIRouter()
-contacts_service = ContactService()
 
 
-@router.post("/contacts", response_model=Contact, tags=["contacts"])
-def create(item_create: ContactCreate):
+@router.post("/contacts", response_model=Contact)
+def create_contact(item_create: ContactCreate, contacts_service: ContactService = Depends(get_contacts_service)):
     """
     create an contact
     """
     return contacts_service.create_item(item_create)
 
 
-@router.get("/contacts/{id}", response_model=Contact, tags=["contacts"])
-def get_contact(id: str):
+@router.get("/contacts/{id}", response_model=Contact)
+def get_contact(id: str, contacts_service: ContactService = Depends(get_contacts_service)):
     """
     get any specific contact
     """
@@ -29,8 +29,8 @@ def get_contact(id: str):
     return item
 
 
-@router.get("/contacts", response_model=List[Contact], tags=["contacts"])
-def list_contacts():
+@router.get("/contacts", response_model=List[Contact])
+def list_contacts(contacts_service: ContactService = Depends(get_contacts_service)):
     """
     get many contacts
     """
@@ -40,8 +40,9 @@ def list_contacts():
     return items
 
 
-@router.put("/contacts/{id}", response_model=Contact, tags=["contacts"])
-def update_contact(id: UUID, item_update: ContactUpdate):
+@router.put("/contacts/{id}", response_model=Contact)
+def update_contact(id: UUID, item_update: ContactUpdate,
+                   contacts_service: ContactService = Depends(get_contacts_service)):
     """
     update an contact
     """
@@ -51,8 +52,8 @@ def update_contact(id: UUID, item_update: ContactUpdate):
     return contacts_service.update_item(id, item_update)
 
 
-@router.delete("/contacts/{id}", response_model=Contact, tags=["contacts"])
-def delete_contact(id: UUID):
+@router.delete("/contacts/{id}", response_model=Contact)
+def delete_contact(id: UUID, contacts_service: ContactService = Depends(get_contacts_service)):
     """
     delete an item
     """
