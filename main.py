@@ -5,13 +5,15 @@ import firebase_admin
 from fastapi import FastAPI, Depends
 
 from v1 import http
-from v1.deps import authenticate_user
+from v1.deps import authenticate_user, get_settings
 from v1.routers import health, login, contact
 
 os.environ["TZ"] = "UTC"
 
-title_detail = os.getenv("PROJECT_ID", "Local")
-version = os.getenv("SHORT_SHA", "local")
+settings = get_settings()
+
+title_detail = settings.PROJECT_ID
+version = settings.SHORT_SHA
 api = FastAPI(title=f"Contacts API: {title_detail}", version=version)
 
 # /
