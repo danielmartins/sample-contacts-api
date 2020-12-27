@@ -16,4 +16,5 @@ setup(name='contacts-app-api',
           'httptools==0.1.1',
           "google-cloud-firestore==1.9.0",
           "pydantic[email]==1.7.3",
+          "aiohttp==3.7.3"
       ])

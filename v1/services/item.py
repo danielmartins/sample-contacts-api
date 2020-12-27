@@ -6,7 +6,7 @@ from v1.schemas.item import Contact, ContactCreate, ContactUpdate
 item_dao = ItemDAO()
 
 
-class ItemService:
+class ContactService:
     def create_item(self, item_create: ContactCreate) -> Contact:
         return item_dao.create(item_create)
 
